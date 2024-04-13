@@ -5,3 +5,4 @@
 asuratoon.com##.mm
 asuratoon.com##.headpost
 asuratoon.com##.bixbox
+asuratoon.com##.chdesc
