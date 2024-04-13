@@ -19,7 +19,7 @@ const webManifest = {
 
 let existingMetaTag1 = document.querySelector('meta[name="apple-mobile-web-app-capable"]');
 let existingMetaTag2 = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-let asuramenu = document.querySelector('.mm');
+let asuramenu = document.querySelector('.nav');
 let asuramenumobile = document.querySelector('.th');
 
 const manifestElem = document.createElement('link');
