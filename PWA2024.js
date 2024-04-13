@@ -1,18 +1,3 @@
-Skip to content
- 
-Search…
-All gists
-Back to GitHub
-@therysin
-therysin/PWA2024.js
-Last active now
-Code
-Revisions
-2
-Clone this repository at &lt;script src=&quot;https://gist.github.com/therysin/41a95294e55b67f1536a53d6ef6a633a.js&quot;&gt;&lt;/script&gt;
-<script src="https://gist.github.com/therysin/41a95294e55b67f1536a53d6ef6a633a.js"></script>
-PWA2024 Userscript
-PWA2024.js
 // ==UserScript==
 // @name      PWA2024
 // @author    Therysin
@@ -68,19 +53,6 @@ if (existingMetaTag2) {
 if (asuramenu) {
   asuramenu.setAttribute('style', 'background-color:black')
 }
-@therysin
-Comment
- 
-Leave a comment
- 
-Footer
-© 2024 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
-Status
-Docs
 Contact
 Manage cookies
 Do not share my personal information
