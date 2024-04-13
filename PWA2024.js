@@ -20,6 +20,7 @@ const webManifest = {
 let existingMetaTag1 = document.querySelector('meta[name="apple-mobile-web-app-capable"]');
 let existingMetaTag2 = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
 let asuramenu = document.querySelector('.mm');
+let asuramenumobile = document.querySelector('.th');
 
 const manifestElem = document.createElement('link');
 manifestElem.setAttribute('rel', 'manifest');
@@ -52,4 +53,8 @@ if (existingMetaTag2) {
 
 if (asuramenu) {
   asuramenu.setAttribute('style', 'background-color:black')
+}
+
+if (asuramenumobile) {
+  asuramenumobile.setAttribute('style', 'background-color:black')
 }
