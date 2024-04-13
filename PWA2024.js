@@ -53,6 +53,3 @@ if (existingMetaTag2) {
 if (asuramenu) {
   asuramenu.setAttribute('style', 'background-color:black')
 }
-Contact
-Manage cookies
-Do not share my personal information
