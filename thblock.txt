@@ -1,0 +1,7 @@
+! Title: Therysin's Custom Blocklist
+! Description: Therysin
+
+
+asuratoon.com##.mm
+asuratoon.com##.headpost
+asuratoon.com##.bixbox
