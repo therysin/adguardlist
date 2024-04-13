@@ -2,7 +2,6 @@
 ! Description: Therysin
 
 
-asuratoon.com##.mm
 asuratoon.com##.headpost
 asuratoon.com##.ts-breadcrumb
 asuratoon.com##.chdesc
