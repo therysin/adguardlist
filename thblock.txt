@@ -7,3 +7,7 @@ asuratoon.com##.headpost
 asuratoon.com##.ts-breadcrumb
 asuratoon.com##.chdesc
 asuratoon.com##.chaptertags
+asuratoon.com##.releases
+asuratoon.com##.listupd
+asuratoon.com##comment-policy
+asuratoon.com##reactions_container
