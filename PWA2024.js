@@ -8,12 +8,22 @@
 // @noframes
 // ==/UserScript==
 
+const domain = window.location.hostname; // Get the current domain from the URL
+const faviconUrl = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`; 
+
 const webManifest = {
   "name": "",
   "short_name": "",
   "theme_color": "#0000",
   "background_color": "#0000",
   "display": "standalone"
+  "icons": [
+    {
+      "src": faviconUrl, // Use the dynamically generated favicon URL
+      "sizes": "64x64", // Adjust the size as needed
+      "type": "image/png"
+    }
+  ]
 };
 
 
