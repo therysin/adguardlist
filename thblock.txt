@@ -11,3 +11,4 @@ asuratoon.com##.releases
 asuratoon.com##.scrollToTop
 asuratoon.com###comment-policy
 asuratoon.com###reactions_container
+toonily.com###chapter-heading
