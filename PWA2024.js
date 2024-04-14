@@ -8,9 +8,6 @@
 // @noframes
 // ==/UserScript==
 
-// Service Worker script URL
-const serviceWorkerUrl = 'https://raw.githubusercontent.com/therysin/adguardlist/main/serviceworker.js';
-
 const domain = window.location.hostname; // Get the current domain from the URL
 const faviconUrl = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`; 
 
@@ -41,11 +38,6 @@ manifestElem.setAttribute('rel', 'manifest');
 manifestElem.setAttribute('href', 'data:application/manifest+json;base64,' + btoa(JSON.stringify(webManifest)));
 document.head.prepend(manifestElem);
 
-// Create the link element for the service worker
-const swElem = document.createElement('link');
-swElem.setAttribute('rel', 'serviceworker');
-swElem.setAttribute('href', serviceWorkerUrl);
-document.head.appendChild(swElem);
 
 // Check if the meta tag exists
 if (existingMetaTag1) {
