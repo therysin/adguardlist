@@ -16,7 +16,7 @@ const webManifest = {
   "short_name": "",
   "theme_color": "#0000",
   "background_color": "#0000",
-  "display": "standalone"
+  "display": "standalone",
   "icons": [
     {
       "src": faviconUrl, // Use the dynamically generated favicon URL
