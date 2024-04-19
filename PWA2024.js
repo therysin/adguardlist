@@ -9,7 +9,7 @@
 // ==/UserScript==
 
 const domain = window.location.hostname; // Get the current domain from the URL
-const faviconUrl = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`; 
+const faviconUrl = `https://www.google.com/s2/favicons?sz=256&domain=${domain}`; 
 
 const webManifest = {
 //  "name": "",
@@ -20,7 +20,7 @@ const webManifest = {
   "icons": [
     {
       "src": faviconUrl, // Use the dynamically generated favicon URL
-      "sizes": "64x64", // Adjust the size as needed
+      "sizes": "256x256", // Adjust the size as needed
       "type": "image/png"
     }
   ]
@@ -29,8 +29,6 @@ const webManifest = {
 
 let existingMetaTag1 = document.querySelector('meta[name="apple-mobile-web-app-capable"]');
 let existingMetaTag2 = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-let asuramenu = document.querySelector('.nav');
-let asuramenumobile = document.querySelector('.th');
 
 // Create the link element for the manifest
 const manifestElem = document.createElement('link');
@@ -61,12 +59,4 @@ if (existingMetaTag2) {
     newMetaTag2.setAttribute('name', 'apple-mobile-web-app-status-bar-style');
     newMetaTag2.setAttribute('content', 'black-translucent');
     document.head.appendChild(newMetaTag2);
-}
-
-if (asuramenu) {
-  asuramenu.setAttribute('style', 'background-color:black')
-}
-
-if (asuramenumobile) {
-  asuramenumobile.setAttribute('style', 'background-color:black')
 }
