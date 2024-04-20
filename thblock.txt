@@ -12,5 +12,5 @@ asuratoon.com##.scrollToTop
 asuratoon.com###comment-policy
 asuratoon.com###reactions_container
 toonily.com###chapter-heading
-omegascans.org/*/*##nav
+omegascans.org/*/*/##nav
 omegascans.org###content > div.min-h-screen:first-child > div.container:nth-child(2) > div.container.my-5.px-5.flex.flex-col.gap-y-3:nth-child(2) > div.flex.flex-row.gap-x-3.justify-center.bg-background.grow-0.p-4.rounded.self-center.shadow-md:first-child
