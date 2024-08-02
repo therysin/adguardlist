@@ -1,0 +1,9 @@
+! Title: Therysin's Apple Blocklist
+! Description: Therysin
+
+ffapple.com
+ppq.apple.com
+ocsp.apple.com
+ocsp2.apple.com
+www.ocsp.apple.com
+www.ocsp2.apple.com
