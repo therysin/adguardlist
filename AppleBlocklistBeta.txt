@@ -1,0 +1,10 @@
+! Title: Therysin's Apple Blocklist Beta
+! Description: Therysin
+
+ocsp.apple.com
+ocsp2.apple.com
+valid.apple.com
+crl.apple.com
+certs.apple.com
+appattest.apple.com
+vpp.itunes.apple.com
