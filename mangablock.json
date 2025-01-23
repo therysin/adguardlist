@@ -7,5 +7,13 @@
             "type": "css-display-none",
             "selector": ".bg-gradient-to-br, .pf-wrapper, iframe, img[alt='Centered Image']"
         }
+    },
+    {
+        "trigger": {
+            "url-filter": ".*ad.*"
+        },
+        "action": {
+            "type": "block"
+        }
     }
 ]
