@@ -5,7 +5,7 @@
         },
         "action": {
             "type": "css-display-none",
-            "selector": ".bg-gradient-to-br, .PUBFUTURE"
+            "selector": ".bg-gradient-to-br, .PUBFUTURE, iframe"
         }
     }
 ]
