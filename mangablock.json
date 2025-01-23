@@ -5,7 +5,7 @@
         },
         "action": {
             "type": "css-display-none",
-            "selector": ".bg-gradient-to-br, .chapter-above-ads, [class*='ad']"
+            "selector": ".bg-gradient-to-br, [class*='ad']"
         }
     }
 ]
