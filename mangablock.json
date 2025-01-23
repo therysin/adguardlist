@@ -14,7 +14,7 @@
         },
         "action": {
             "type": "css-display-none",
-            "selector": "a[href='/subscription'] img"
+            "selector": "img[src='https://i.imgur.com/jsfrn2G.png']"
         }
     }
 ]
