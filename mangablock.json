@@ -10,11 +10,10 @@
     },
     {
         "trigger": {
-            "url-filter": ".*"
+            "url-filter": "https://i.imgur.com/jsfrn2G.png"
         },
         "action": {
-            "type": "css-display-none",
-            "selector": "img[src='https://i.imgur.com/jsfrn2G.png']"
+            "type": "block"
         }
     }
 ]
