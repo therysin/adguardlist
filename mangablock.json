@@ -5,7 +5,7 @@
         },
         "action": {
             "type": "css-display-none",
-            "selector": ".bg-gradient-to-br, .pf-wrapper, iframe, a[href='/subscription']"
+            "selector": ".bg-gradient-to-br, .pf-wrapper, iframe, img[alt='Centered Image']"
         }
     },
     {
