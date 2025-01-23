@@ -5,7 +5,16 @@
         },
         "action": {
             "type": "css-display-none",
-            "selector": ".bg-gradient-to-br, .pf-wrapper, a[href='/subscription'], iframe"
+            "selector": ".bg-gradient-to-br, .pf-wrapper, iframe"
+        }
+    },
+    {
+        "trigger": {
+            "url-filter": ".*"
+        },
+        "action": {
+            "type": "css-display-none",
+            "selector": "a[href='/subscription'],"
         }
     }
 ]
