@@ -5,7 +5,7 @@
         },
         "action": {
             "type": "css-display-none",
-            "selector": ".bg-gradient-to-br, .pf-wrapper"
+            "selector": ".bg-gradient-to-br, .pf-wrapper, a[href='/subscription'], iframe"
         }
     }
 ]
