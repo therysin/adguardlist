@@ -5,7 +5,7 @@
         },
         "action": {
             "type": "css-display-none",
-            "selector": ".bg-gradient-to-br, .pf-wrapper, img[alt='Centered Image'], iframe, .z-50, h2.py-4"
+            "selector": ".bg-gradient-to-br, .pf-wrapper, img[alt='Centered Image'], iframe, .z-50, h2.py-4, div.py-2, h2.text-xl, p.text-sm"
         }
     }
     
