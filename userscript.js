@@ -4,7 +4,7 @@
 // @version      1.0
 // @description  Changes the header background color to black on a specific website.
 // @author       Your Name
-// @match        https://example.com/*
+// @match        https://asuracomic.net/*
 // @grant        none
 // ==/UserScript==
 
