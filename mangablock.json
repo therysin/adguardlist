@@ -5,7 +5,7 @@
         },
         "action": {
             "type": "css-display-none",
-            "selector": "div.fixed.inset-0.z-\\[9999\\].flex.items-center.justify-center.p-4"
+            "selector": "div.fixed.inset-0.z-\\[9999\\].flex.items-center.justify-center.p-4, .w-full"
         }
     }
     
