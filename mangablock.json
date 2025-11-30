@@ -7,6 +7,14 @@
             "type": "css-display-none",
             "selector": "div.fixed.inset-0.z-\\[9999\\].flex.items-center.justify-center.p-4, .bg-gradient-to-br, .pf-wrapper, img[alt='Centered Image'], h2.py-4, h2.text-xl, p.text-sm, div.flex.items-center.justify-center.gap-1.py-2, div.relative.z-50.overflow-hidden"
         }
+    },
+    {
+        "trigger": {
+            "url-filter": ".*",
+            "resource-type": ["media", "svg-document", "popup"]
+        },
+        "action": {
+            "type": "block"
+        }
     }
-    
 ]
