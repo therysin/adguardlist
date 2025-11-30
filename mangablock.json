@@ -11,7 +11,7 @@
     {
         "trigger": {
             "url-filter": ".*",
-            "resource-type": ["media", "svg-document", "popup"]
+            "resource-type": ["svg-document", "popup"]
         },
         "action": {
             "type": "block"
