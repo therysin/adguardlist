@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Manga Reader Optimizer & Throttler (Battery Saver)
-// @namespace    http://therysin.com
+// @namespace    https://github.com/therysin
 // @version      1.2
 // @description  Sets background to black, kills CSS animations, and throttles JS timers to save battery.
 // @author       Therysin
@@ -10,9 +10,6 @@
 
 (function() {
     'use strict';
-
-    console.log("MangaReader: Battery Saver initialized.");
-
     // =========================================================
     // 1. CPU SAVER: Throttle Animations to 1 FPS
     // =========================================================
