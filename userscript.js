@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Manga Reader Optimizer & Throttler
-// @namespace    https://github.com/therysin
-// @version      1.1
-// @description  Sets background to black and throttles animations to 1FPS to save battery.
+// @name         Manga Reader Optimizer & Throttler (Battery Saver)
+// @namespace    http://therysin.com
+// @version      1.2
+// @description  Sets background to black, kills CSS animations, and throttles JS timers to save battery.
 // @author       Therysin
 // @match        *://*/*
 // @grant        none
@@ -11,44 +11,54 @@
 (function() {
     'use strict';
 
+    console.log("MangaReader: Battery Saver initialized.");
+
     // =========================================================
     // 1. CPU SAVER: Throttle Animations to 1 FPS
     // =========================================================
-    // This overrides the browser's animation engine.
-    // Instead of refreshing 60 times a second, it waits 1000ms (1 second).
-    
     window.requestAnimationFrame = function(callback) {
         return window.setTimeout(function() {
             callback(Date.now());
         }, 1000);
     };
 
-    // We also need to override the cancel function to map to clearTimeout
     window.cancelAnimationFrame = function(id) {
         clearTimeout(id);
     };
 
-    console.log("MangaReader: Animations throttled to 1 FPS.");
-
-
     // =========================================================
-    // 2. STYLING FIXES (Your existing code)
+    // 2. CPU SAVER: Clamp High-Frequency Timers
     // =========================================================
-    
-    // Attempt to change header immediately
-    const header = document.querySelector('header.bg-themecolor');
-    if (header) {
-        header.style.backgroundColor = 'black';
-    }
-
-    // Optional: Observer to catch the header if it loads late (AJAX/SPA sites)
-    const observer = new MutationObserver((mutations) => {
-        const headerLate = document.querySelector('header.bg-themecolor');
-        if (headerLate && headerLate.style.backgroundColor !== 'black') {
-            headerLate.style.backgroundColor = 'black';
+    // Many ads and trackers run loops every 10-50ms. 
+    // This forces them to wait at least 1 second (1000ms).
+    const originalSetInterval = window.setInterval;
+    window.setInterval = function(func, delay, ...args) {
+        if (delay < 1000) {
+            delay = 1000;
         }
-    });
+        return originalSetInterval(func, delay, ...args);
+    };
+
+    // =========================================================
+    // 3. GPU SAVER: Global CSS Injection
+    // =========================================================
+    // Instead of using a MutationObserver (which costs CPU), 
+    // we inject CSS rules that the browser applies automatically.
     
-    observer.observe(document.body, { childList: true, subtree: true });
+    const css = `     
+        /* STOP ALL CSS ANIMATIONS */
+        /* This stops spinning loaders, flashing ads, and transitions */
+        *, *::before, *::after {
+            animation: none !important;
+            transition: none !important;
+        }
+    `;
+
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode(css));
+    
+    // Append to head (or body if head doesn't exist yet)
+    (document.head || document.documentElement).appendChild(style);
 
 })();
