@@ -44,15 +44,15 @@
  
     // A. Force the browser to render as a mobile device (width=device-width)
     // This stops the page from loading as a giant "Desktop" site.
-    let viewport = document.querySelector("meta[name=viewport]");
-    if (!viewport) {
-        viewport = document.createElement("meta");
-        viewport.name = "viewport";
-        document.head.appendChild(viewport);
-    }
+    // let viewport = document.querySelector("meta[name=viewport]");
+    // if (!viewport) {
+    //     viewport = document.createElement("meta");
+    //     viewport.name = "viewport";
+    //     document.head.appendChild(viewport);
+    // }
     // "width=device-width" aligns page width to screen width.
     // "initial-scale=1.0" ensures it starts at 100% zoom (no zoom in/out).
-    viewport.content = "width=device-width, initial-scale=0.98, maximum-scale=5.0, user-scalable=yes";
+    // viewport.content = "width=device-width, initial-scale=0.98, maximum-scale=5.0, user-scalable=yes";
 
     // =========================================================
     // 4. GPU SAVER: Global CSS Injection
