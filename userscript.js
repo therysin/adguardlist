@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Manga Reader Optimizer & Throttler
-// @namespace    http://therysin.com
+// @namespace    https://github.com/therysin
 // @version      1.1
 // @description  Sets background to black and throttles animations to 1FPS to save battery.
 // @author       Therysin
