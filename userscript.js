@@ -61,6 +61,13 @@
     // we inject CSS rules that the browser applies automatically.
     
     const css = `     
+
+        img {
+            max-width: 100vw !important; /* Never wider than viewport */
+            height: auto !important;     /* Keep aspect ratio */
+            object-fit: contain;
+        }
+        
         /* STOP ALL CSS ANIMATIONS */
         /* This stops spinning loaders, flashing ads, and transitions */
         *, *::before, *::after {
