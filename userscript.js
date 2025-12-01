@@ -11,7 +11,7 @@
 (function() {
     'use strict';
     // =========================================================
-    // 1. CPU SAVER: Throttle Animations to 1 FPS
+    // 1. CPU SAVER: Throttle Animations to 1 FPS , width fixes
     // =========================================================
     window.requestAnimationFrame = function(callback) {
         return window.setTimeout(function() {
@@ -22,6 +22,8 @@
     window.cancelAnimationFrame = function(id) {
         clearTimeout(id);
     };
+
+    
 
     // =========================================================
     // 2. CPU SAVER: Clamp High-Frequency Timers
@@ -37,7 +39,23 @@
     };
 
     // =========================================================
-    // 3. GPU SAVER: Global CSS Injection
+    // 3. FIT WIDTH & AUTO-ZOOM 
+    // =========================================================
+ 
+    // A. Force the browser to render as a mobile device (width=device-width)
+    // This stops the page from loading as a giant "Desktop" site.
+    let viewport = document.querySelector("meta[name=viewport]");
+    if (!viewport) {
+        viewport = document.createElement("meta");
+        viewport.name = "viewport";
+        document.head.appendChild(viewport);
+    }
+    // "width=device-width" aligns page width to screen width.
+    // "initial-scale=1.0" ensures it starts at 100% zoom (no zoom in/out).
+    viewport.content = "width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes";
+
+    // =========================================================
+    // 4. GPU SAVER: Global CSS Injection
     // =========================================================
     // Instead of using a MutationObserver (which costs CPU), 
     // we inject CSS rules that the browser applies automatically.
