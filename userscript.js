@@ -14,73 +14,7 @@
     // 1. CONFIGURATION (Forced ON for testing)
     // =========================================================
     const ENABLE_DATA_SAVER = true; 
-    const IMAGE_QUALITY = 50; // Quality 1-100 (60 is a good balance)
-
-    // // =========================================================
-    // // 2. DATA SAVER (Image Proxy & Compression)
-    // // =========================================================
-    // if (ENABLE_DATA_SAVER) {
- 
-    //     // Helper: Construct wsrv.nl URL
-    //     function createProxyUrl(originalUrl) {
-    //         // Ignore if already proxied, base64 data, or empty
-    //         if (!originalUrl || originalUrl.includes('wsrv.nl') || originalUrl.startsWith('data:')) return originalUrl;
- 
-    //         // Encode and rewrite
-    //         const encoded = encodeURIComponent(originalUrl);
-    //         return `https://wsrv.nl/?url=${encoded}&w=${window.innerWidth}&q=${IMAGE_QUALITY}&output=webp`;
-    //     }
- 
-    //     // Processor: Rewrites the image source
-    //     function processImage(img) {
-    //         // Prevent double-processing
-    //         if (img.dataset.processed) return; 
- 
-    //         // Get the URL (Handle lazy-loaded 'data-src' vs standard 'src')
-    //         //const originalSrc = img.getAttribute('data-src') || img.getAttribute('src');
-    //         const originalSrc = img.getAttribute('data-src') || img.src;//fix
-    //         if (!originalSrc) return;
- 
-    //         // Mark as processed so we don't loop
-    //         img.dataset.processed = "true";
- 
-    //         // SAVE ORIGINAL (Vital for the Fallback)
-    //         img.dataset.original = originalSrc;
- 
-    //         // FAIL-SAFE: If proxy fails (404/403), revert to original URL
-    //         img.onerror = function() {
-    //             this.onerror = null; // Stop infinite loops
-    //             console.log("MangaReader: Proxy failed. Reverting to original.");
-    //             this.src = this.dataset.original;
-    //         };
- 
-    //         // Remove 'srcset' if it exists (Browsers prioritize it over 'src', bypassing our proxy)
-    //         if (img.hasAttribute('srcset')) img.removeAttribute('srcset');
- 
-    //         // Apply the Proxy
-    //         const newSrc = createProxyUrl(originalSrc);
- 
-    //         // Update the tag
-    //         if (img.getAttribute('data-src')) img.setAttribute('data-src', newSrc);
-    //         img.src = newSrc;
-    //     }
- 
-    //     // Observer: Watch for new images appearing (Infinite Scroll/Lazy Load)
-    //     const imageObserver = new MutationObserver((mutations) => {
-    //         mutations.forEach((mutation) => {
-    //             mutation.addedNodes.forEach((node) => {
-    //                 if (node.tagName === 'IMG') processImage(node);
-    //                 if (node.querySelectorAll) node.querySelectorAll('img').forEach(processImage);
-    //             });
-    //         });
-    //     });
- 
-    //     // Start Observing
-    //     imageObserver.observe(document.body, { childList: true, subtree: true });
- 
-    //     // Process images that are already loaded
-    //     document.querySelectorAll('img').forEach(processImage);
-    // }
+    const IMAGE_QUALITY = 55; // Quality 1-100 (60 is a good balance)
 
 // =========================================================
 // 2. DATA SAVER (No Fallback)
