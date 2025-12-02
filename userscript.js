@@ -37,7 +37,8 @@
     //         if (img.dataset.processed) return; 
  
     //         // Get the URL (Handle lazy-loaded 'data-src' vs standard 'src')
-    //         const originalSrc = img.getAttribute('data-src') || img.getAttribute('src');
+    //         //const originalSrc = img.getAttribute('data-src') || img.getAttribute('src');
+    //         const originalSrc = img.getAttribute('data-src') || img.src;//fix
     //         if (!originalSrc) return;
  
     //         // Mark as processed so we don't loop
@@ -95,7 +96,8 @@
         function processImage(img) {
             if (img.dataset.processed) return; 
  
-            const originalSrc = img.getAttribute('data-src') || img.getAttribute('src');
+            // const originalSrc = img.getAttribute('data-src') || img.getAttribute('src');
+            const originalSrc = img.getAttribute('data-src') || img.src; //fix
             if (!originalSrc) return;
  
             img.dataset.processed = "true";
