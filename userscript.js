@@ -91,7 +91,7 @@
         function createProxyUrl(originalUrl) {
             if (!originalUrl || originalUrl.includes('wsrv.nl') || originalUrl.startsWith('data:')) return originalUrl;
             const encoded = encodeURIComponent(originalUrl);
-            return `https://wsrv.nl/?url=${encoded}&w=${window.displayWidth}&q=${IMAGE_QUALITY}&output=webp`;
+            return `https://wsrv.nl/?url=${encoded}&w=${displayWidth}&q=${IMAGE_QUALITY}&output=webp`;
         }
  
         function processImage(img) {
