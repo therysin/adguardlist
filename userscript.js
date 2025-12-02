@@ -15,6 +15,7 @@
     // =========================================================
     const ENABLE_DATA_SAVER = true; 
     const IMAGE_QUALITY = 40; // Quality 1-100 (60 is a good balance)
+    const displayWidth = img.clientWidth || img.width || window.innerWidth;
 
     // // =========================================================
     // // 2. DATA SAVER (Image Proxy & Compression)
@@ -90,7 +91,7 @@
         function createProxyUrl(originalUrl) {
             if (!originalUrl || originalUrl.includes('wsrv.nl') || originalUrl.startsWith('data:')) return originalUrl;
             const encoded = encodeURIComponent(originalUrl);
-            return `https://wsrv.nl/?url=${encoded}&w=${window.innerWidth}&q=${IMAGE_QUALITY}&output=webp`;
+            return `https://wsrv.nl/?url=${encoded}&w=${window.displayWidth}&q=${IMAGE_QUALITY}&output=webp`;
         }
  
         function processImage(img) {
