@@ -11,7 +11,7 @@
 (function() {
     'use strict';
     // =========================================================
-    // 1. CPU SAVER: Throttle Animations to 1 FPS , width fixes
+    // 1. CPU SAVER: Throttle Animations to 1 FPS , width fixes, kill popups
     // =========================================================
     window.requestAnimationFrame = function(callback) {
         return window.setTimeout(function() {
@@ -23,7 +23,9 @@
         clearTimeout(id);
     };
 
-    
+    window.open = function() {
+        return null;
+    };
 
     // =========================================================
     // 2. CPU SAVER: Clamp High-Frequency Timers
