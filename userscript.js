@@ -14,7 +14,7 @@
     // 1. CONFIGURATION (Forced ON for testing)
     // =========================================================
     const ENABLE_DATA_SAVER = true; 
-    const IMAGE_QUALITY = 25; // Quality 1-100 (60 is a good balance)
+    const IMAGE_QUALITY = 40; // Quality 1-100 (60 is a good balance)
 
     // // =========================================================
     // // 2. DATA SAVER (Image Proxy & Compression)
