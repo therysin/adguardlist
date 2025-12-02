@@ -15,7 +15,6 @@
     // =========================================================
     const ENABLE_DATA_SAVER = true; 
     const IMAGE_QUALITY = 40; // Quality 1-100 (60 is a good balance)
-    const displayWidth = img.clientWidth || img.width || window.innerWidth;
 
     // // =========================================================
     // // 2. DATA SAVER (Image Proxy & Compression)
@@ -83,52 +82,55 @@
     //     document.querySelectorAll('img').forEach(processImage);
     // }
 
-    // =========================================================
-    // 2. DATA SAVER (No Fallback)
-    // =========================================================
-    if (ENABLE_DATA_SAVER) {
- 
-        function createProxyUrl(originalUrl) {
-            if (!originalUrl || originalUrl.includes('wsrv.nl') || originalUrl.startsWith('data:')) return originalUrl;
-            const encoded = encodeURIComponent(originalUrl);
-            return `https://wsrv.nl/?url=${encoded}&w=${displayWidth}&q=${IMAGE_QUALITY}&output=webp`;
+// =========================================================
+// 2. DATA SAVER (No Fallback)
+// =========================================================
+if (ENABLE_DATA_SAVER) {
+
+    function createProxyUrl(originalUrl, width) {
+        if (!originalUrl || originalUrl.includes('wsrv.nl') || originalUrl.startsWith('data:')) return originalUrl;
+        const encoded = encodeURIComponent(originalUrl);
+        return `https://wsrv.nl/?url=${encoded}&w=${width}&q=${IMAGE_QUALITY}&output=webp`;
+    }
+
+    function processImage(img) {
+        if (img.dataset.processed) return;
+
+        const originalSrc = img.getAttribute('data-src') || img.src; // fix
+        if (!originalSrc) return;
+
+        img.dataset.processed = "true";
+
+        // Nuke srcset to force our specific URL
+        if (img.hasAttribute('srcset')) img.removeAttribute('srcset');
+
+        // Compute width per image
+        let displayWidth = img.clientWidth || img.width || window.innerWidth;
+        if (!displayWidth || displayWidth <= 0) {
+            displayWidth = window.innerWidth;
         }
- 
-        function processImage(img) {
-            if (img.dataset.processed) return; 
- 
-            // const originalSrc = img.getAttribute('data-src') || img.getAttribute('src');
-            const originalSrc = img.getAttribute('data-src') || img.src; //fix
-            if (!originalSrc) return;
- 
-            img.dataset.processed = "true";
- 
-            // REMOVED: Saving originalSrc to dataset
-            // REMOVED: img.onerror fallback function
- 
-            // Nuke srcset to force our specific URL
-            if (img.hasAttribute('srcset')) img.removeAttribute('srcset');
- 
-            const newSrc = createProxyUrl(originalSrc);
- 
-            // Force the proxy URL. If this fails, the image dies.
-            if (img.getAttribute('data-src')) img.setAttribute('data-src', newSrc);
-            img.src = newSrc;
-        }
- 
-        const imageObserver = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.tagName === 'IMG') processImage(node);
-                    if (node.querySelectorAll) node.querySelectorAll('img').forEach(processImage);
-                });
+
+        const newSrc = createProxyUrl(originalSrc, displayWidth);
+
+        // Force the proxy URL. If this fails, the image dies.
+        if (img.getAttribute('data-src')) img.setAttribute('data-src', newSrc);
+        img.src = newSrc;
+    }
+
+    const imageObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType !== Node.ELEMENT_NODE) return;
+                if (node.tagName === 'IMG') processImage(node);
+                if (node.querySelectorAll) node.querySelectorAll('img').forEach(processImage);
             });
         });
- 
-        imageObserver.observe(document.body, { childList: true, subtree: true });
-        document.querySelectorAll('img').forEach(processImage);
-    }
-    
+    });
+
+    imageObserver.observe(document.body, { childList: true, subtree: true });
+    document.querySelectorAll('img').forEach(processImage);
+}
+
     // =========================================================
     // 1. CPU SAVER: Throttle Animations to 1 FPS , width fixes, kill popups
     // =========================================================
