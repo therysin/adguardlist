@@ -21,121 +21,126 @@
 // 2. DATA SAVER (No Fallback)
 // =========================================================
 if (ENABLE_DATA_SAVER) {
-        function createProxyUrl(originalUrl, width) {
-            if (!originalUrl || originalUrl.includes('statically.io') || originalUrl.startsWith('data:')) return originalUrl;
-
-            // Strip Protocol
-            let cleanUrl = originalUrl.replace(/^https?:\/\//, '');
-
-            // Construct Statically URL
-            return `https://cdn.statically.io/img/${cleanUrl}?w=${width}&quality=${IMAGE_QUALITY}&f=webp`;
+    function createProxyUrl(originalUrl, width) {
+        if (
+            !originalUrl ||
+            originalUrl.startsWith('data:') ||
+            originalUrl.includes('statically.io')
+        ) {
+            return originalUrl;
         }
 
-        function processImage(img) {
-            // Prevent double processing
-            if (img.dataset.processed === "true") return;
+        // Normalize to absolute URL if needed
+        let src = originalUrl;
 
-            const originalSrc = img.getAttribute('data-src') || img.src;
-            
-            // Filter out tiny icons or tracking pixels
-            if (!originalSrc || img.width < 50 || originalSrc.includes('statically')) return;
+        // Protocol-relative URLs: //cdn.example.com/img.jpg
+        if (src.startsWith('//')) {
+            src = window.location.protocol + src;
+        }
+        // Root-relative URLs: /images/img.jpg
+        else if (src.startsWith('/')) {
+            src = window.location.origin + src;
+        }
 
-            img.dataset.original = originalSrc;
-            img.dataset.processed = "true";
+        // Strip protocol for Statically
+        const cleanUrl = src.replace(/^https?:\/\//, '');
 
-            // Nuke srcset
-            if (img.hasAttribute('srcset')) img.removeAttribute('srcset');
+        // Construct Statically URL
+        return `https://cdn.statically.io/img/${cleanUrl}?w=${width}&quality=${IMAGE_QUALITY}&f=webp`;
+    }
 
-            let displayWidth = img.clientWidth || window.innerWidth;
-            const newSrc = createProxyUrl(originalSrc, displayWidth);
+    function processImage(img) {
+        // Prevent double processing
+        if (img.dataset.processed === 'true') return;
 
-            // 💡 DEBUG: Visual Confirmation
-            // If the script works, the image will have a thick RED border.
-            img.style.border = "4px solid red";
-            img.style.boxSizing = "border-box";
+        const originalSrc = img.getAttribute('data-src') || img.src;
+        if (!originalSrc || originalSrc.includes('statically.io')) return;
 
-            if (!FORCE_PROXY) {
-                img.onerror = function() {
-                    this.onerror = null;
-                    this.src = this.dataset.original;
-                    this.style.border = "4px solid blue"; // Blue border = Fallback triggered
-                };
+        // Filter out tiny icons or tracking pixels if we actually know the size
+        const w = img.clientWidth || img.naturalWidth || img.width || 0;
+        if (w > 0 && w < 50) return;
+
+        img.dataset.original = originalSrc;
+        img.dataset.processed = 'true';
+
+        // Nuke srcset
+        if (img.hasAttribute('srcset')) img.removeAttribute('srcset');
+
+        // Compute per-image width, fallback to viewport width
+        let displayWidth = img.clientWidth;
+        if (!displayWidth || displayWidth <= 0) {
+            displayWidth = window.innerWidth;
+        }
+
+        const newSrc = createProxyUrl(originalSrc, displayWidth);
+
+        if (!FORCE_PROXY) {
+            img.onerror = function () {
+                this.onerror = null;
+                this.src = this.dataset.original;
+            };
+        }
+
+        // Apply URL
+        img.src = newSrc;
+        if (img.getAttribute('data-src')) {
+            img.setAttribute('data-src', newSrc);
+        }
+    }
+
+    // =========================================================
+    // UPDATED OBSERVER (Crucial for Manga Sites)
+    // =========================================================
+    const imageObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            // 1. Handle NEW images added to the DOM
+            if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType !== Node.ELEMENT_NODE) return;
+
+                    if (node.tagName === 'IMG') processImage(node);
+                    if (node.querySelectorAll) {
+                        node.querySelectorAll('img').forEach(processImage);
+                    }
+                });
             }
 
-            // Apply URL
-            img.src = newSrc;
-            if (img.getAttribute('data-src')) img.setAttribute('data-src', newSrc);
-        }
+            // 2. Handle EXISTING images changing their src/data-src (Lazy Loading)
+            if (mutation.type === 'attributes') {
+                const node = mutation.target;
+                if (
+                    node.nodeType === Node.ELEMENT_NODE &&
+                    node.tagName === 'IMG'
+                ) {
+                    const src = node.getAttribute('src') || '';
+                    const dataSrc = node.getAttribute('data-src') || '';
 
-        // =========================================================
-        // 💡 UPDATED OBSERVER (Crucial for Manga Sites)
-        // =========================================================
-        const imageObserver = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                
-                // 1. Handle NEW images added to the DOM
-                if (mutation.type === 'childList') {
-                    mutation.addedNodes.forEach((node) => {
-                        if (node.nodeType === Node.ELEMENT_NODE) {
-                            if (node.tagName === 'IMG') processImage(node);
-                            if (node.querySelectorAll) node.querySelectorAll('img').forEach(processImage);
-                        }
-                    });
-                }
-                
-                // 2. Handle EXISTING images changing their src (Lazy Loading)
-                if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
-                    const node = mutation.target;
-                    if (node.tagName === 'IMG' && !node.src.includes('statically.io')) {
-                        // Reset processed flag if the site changed the src back
-                        node.dataset.processed = "false"; 
+                    // Only re-process if the site changed away from our proxy
+                    if (
+                        !src.includes('statically.io') &&
+                        !dataSrc.includes('statically.io')
+                    ) {
+                        node.dataset.processed = 'false';
                         processImage(node);
                     }
                 }
-            });
+            }
         });
+    });
 
-        // Watch for child additions AND attribute changes
-        imageObserver.observe(document.body, { 
-            childList: true, 
-            subtree: true, 
-            attributes: true, 
-            attributeFilter: ['src', 'data-src'] 
-        });
-        
-        // Initial run
-        document.querySelectorAll('img').forEach(processImage);
-    }
+    // Watch for child additions AND attribute changes
+    imageObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['src', 'data-src'],
+    });
+
+    // Initial run
+    document.querySelectorAll('img').forEach(processImage);
+}
+
 })();
-    // =========================================================
-    // 1. CPU SAVER: Throttle Animations to 1 FPS , width fixes, kill popups
-    // =========================================================
-    window.requestAnimationFrame = function(callback) {
-        return window.setTimeout(function() {
-            callback(Date.now());
-        }, 1000);
-    };
-
-    window.cancelAnimationFrame = function(id) {
-        clearTimeout(id);
-    };
-
-    window.open = function() {
-        return null;
-    };
-
-    // =========================================================
-    // 2. CPU SAVER: Clamp High-Frequency Timers
-    // =========================================================
-    // Many ads and trackers run loops every 10-50ms. 
-    // This forces them to wait at least 1 second (1000ms).
-    const originalSetInterval = window.setInterval;
-    window.setInterval = function(func, delay, ...args) {
-        if (delay < 1000) {
-            delay = 1000;
-        }
-        return originalSetInterval(func, delay, ...args);
-    };
 
     // =========================================================
     // 3. FIT WIDTH & AUTO-ZOOM 
