@@ -20,36 +20,160 @@
 // =========================================================
 // 2. DATA SAVER (No Fallback)
 // =========================================================
+// if (ENABLE_DATA_SAVER) {
+//     function createProxyUrl(originalUrl, width) {
+//         if (
+//             !originalUrl ||
+//             originalUrl.startsWith('data:') ||
+//             originalUrl.includes('i0.wp.com')
+//         ) {
+//             return originalUrl;
+//         }
+
+//         // Normalize to absolute URL
+//         let url = originalUrl;
+//         try {
+//             // Handles relative URLs (/img.jpg, img.jpg) and protocol-relative (//cdn.example.com/img.jpg)
+//             url = new URL(originalUrl, window.location.href).href;
+//         } catch (e) {
+//             // If URL constructor fails, bail out and use original
+//             return originalUrl;
+//         }
+
+//         const isHttps = url.startsWith('https://');
+//         const noProtocol = url.replace(/^https?:\/\//, '');
+
+//         // Photon pattern: https://i0.wp.com/example.com/image.jpg?w=WIDTH&quality=Q[&ssl=1]
+//         let proxyUrl = `https://i0.wp.com/${noProtocol}?w=${width}&quality=${IMAGE_QUALITY}`;
+//         if (isHttps) {
+//             proxyUrl += '&ssl=1';
+//         }
+
+//         return proxyUrl;
+//     }
+
+//     function processImage(img) {
+//         // Prevent double processing
+//         if (img.dataset.processed === 'true') return;
+
+//         const originalSrc = img.getAttribute('data-src') || img.src;
+//         if (!originalSrc || originalSrc.includes('i0.wp.com')) return;
+
+//         // Filter out tiny icons or tracking pixels if we actually know the size
+//         const w = img.clientWidth || img.naturalWidth || img.width || 0;
+//         if (w > 0 && w < 50) return;
+
+//         img.dataset.original = originalSrc;
+//         img.dataset.processed = 'true';
+
+//         // Nuke srcset
+//         if (img.hasAttribute('srcset')) img.removeAttribute('srcset');
+
+//         // Compute per-image width, fallback to viewport width
+//         let displayWidth = img.clientWidth;
+//         if (!displayWidth || displayWidth <= 0) {
+//             displayWidth = window.innerWidth;
+//         }
+
+//         const newSrc = createProxyUrl(originalSrc, displayWidth);
+
+//         if (!FORCE_PROXY) {
+//             img.onerror = function () {
+//                 this.onerror = null;
+//                 this.src = this.dataset.original;
+//             };
+//         }
+
+//         // Apply URL
+//         img.src = newSrc;
+//         if (img.getAttribute('data-src')) {
+//             img.setAttribute('data-src', newSrc);
+//         }
+//     }
+
+//     // =========================================================
+//     // UPDATED OBSERVER (Crucial for Manga Sites)
+//     // =========================================================
+//     const imageObserver = new MutationObserver((mutations) => {
+//         mutations.forEach((mutation) => {
+//             // 1. Handle NEW images added to the DOM
+//             if (mutation.type === 'childList') {
+//                 mutation.addedNodes.forEach((node) => {
+//                     if (node.nodeType !== Node.ELEMENT_NODE) return;
+
+//                     if (node.tagName === 'IMG') processImage(node);
+//                     if (node.querySelectorAll) {
+//                         node.querySelectorAll('img').forEach(processImage);
+//                     }
+//                 });
+//             }
+
+//             // 2. Handle EXISTING images changing their src/data-src (Lazy Loading)
+//             if (mutation.type === 'attributes') {
+//                 const node = mutation.target;
+//                 if (
+//                     node.nodeType === Node.ELEMENT_NODE &&
+//                     node.tagName === 'IMG'
+//                 ) {
+//                     const src = node.getAttribute('src') || '';
+//                     const dataSrc = node.getAttribute('data-src') || '';
+
+//                     // Only re-process if the site changed away from our proxy
+//                     if (
+//                         !src.includes('i0.wp.com') &&
+//                         !dataSrc.includes('i0.wp.com')
+//                     ) {
+//                         node.dataset.processed = 'false';
+//                         processImage(node);
+//                     }
+//                 }
+//             }
+//         });
+//     });
+
+//     // Watch for child additions AND attribute changes
+//     imageObserver.observe(document.body, {
+//         childList: true,
+//         subtree: true,
+//         attributes: true,
+//         attributeFilter: ['src', 'data-src'],
+//     });
+
+//     // Initial run
+//     document.querySelectorAll('img').forEach(processImage);
+// }
 if (ENABLE_DATA_SAVER) {
     function createProxyUrl(originalUrl, width) {
         if (
             !originalUrl ||
             originalUrl.startsWith('data:') ||
-            originalUrl.includes('i0.wp.com')
+            originalUrl.includes('googleusercontent.com/gadgets/proxy')
         ) {
             return originalUrl;
         }
 
         // Normalize to absolute URL
-        let url = originalUrl;
+        let url;
         try {
-            // Handles relative URLs (/img.jpg, img.jpg) and protocol-relative (//cdn.example.com/img.jpg)
             url = new URL(originalUrl, window.location.href).href;
         } catch (e) {
-            // If URL constructor fails, bail out and use original
+            // If URL constructor fails, just bail out and use the original
             return originalUrl;
         }
 
-        const isHttps = url.startsWith('https://');
-        const noProtocol = url.replace(/^https?:\/\//, '');
+        // Google OpenSocial proxy endpoint (one of the common hosts)
+        const base = 'https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy';
 
-        // Photon pattern: https://i0.wp.com/example.com/image.jpg?w=WIDTH&quality=Q[&ssl=1]
-        let proxyUrl = `https://i0.wp.com/${noProtocol}?w=${width}&quality=${IMAGE_QUALITY}`;
-        if (isHttps) {
-            proxyUrl += '&ssl=1';
-        }
+        // Build query params
+        const params = new URLSearchParams();
+        params.set('url', url);
+        params.set('container', 'focus');
+        params.set('resize_w', width.toString());
+        // Optional extras:
+        // params.set('refresh', '3600');      // cache time in seconds
+        // params.set('rewriteMime', 'image/*');
 
-        return proxyUrl;
+        return `${base}?${params.toString()}`;
     }
 
     function processImage(img) {
@@ -57,9 +181,14 @@ if (ENABLE_DATA_SAVER) {
         if (img.dataset.processed === 'true') return;
 
         const originalSrc = img.getAttribute('data-src') || img.src;
-        if (!originalSrc || originalSrc.includes('i0.wp.com')) return;
+        if (
+            !originalSrc ||
+            originalSrc.includes('googleusercontent.com/gadgets/proxy')
+        ) {
+            return;
+        }
 
-        // Filter out tiny icons or tracking pixels if we actually know the size
+        // Filter out tiny icons or tracking pixels if we actually know size
         const w = img.clientWidth || img.naturalWidth || img.width || 0;
         if (w > 0 && w < 50) return;
 
@@ -69,7 +198,7 @@ if (ENABLE_DATA_SAVER) {
         // Nuke srcset
         if (img.hasAttribute('srcset')) img.removeAttribute('srcset');
 
-        // Compute per-image width, fallback to viewport width
+        // Compute per-image width, fallback to viewport
         let displayWidth = img.clientWidth;
         if (!displayWidth || displayWidth <= 0) {
             displayWidth = window.innerWidth;
@@ -92,11 +221,11 @@ if (ENABLE_DATA_SAVER) {
     }
 
     // =========================================================
-    // UPDATED OBSERVER (Crucial for Manga Sites)
-    // =========================================================
+    // UPDATED OBSERVER (for lazy-loaded / dynamic images)
+// =========================================================
     const imageObserver = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
-            // 1. Handle NEW images added to the DOM
+            // 1. New images added to the DOM
             if (mutation.type === 'childList') {
                 mutation.addedNodes.forEach((node) => {
                     if (node.nodeType !== Node.ELEMENT_NODE) return;
@@ -108,7 +237,7 @@ if (ENABLE_DATA_SAVER) {
                 });
             }
 
-            // 2. Handle EXISTING images changing their src/data-src (Lazy Loading)
+            // 2. Existing images changing src/data-src (lazy loading)
             if (mutation.type === 'attributes') {
                 const node = mutation.target;
                 if (
@@ -120,8 +249,8 @@ if (ENABLE_DATA_SAVER) {
 
                     // Only re-process if the site changed away from our proxy
                     if (
-                        !src.includes('i0.wp.com') &&
-                        !dataSrc.includes('i0.wp.com')
+                        !src.includes('googleusercontent.com/gadgets/proxy') &&
+                        !dataSrc.includes('googleusercontent.com/gadgets/proxy')
                     ) {
                         node.dataset.processed = 'false';
                         processImage(node);
@@ -142,24 +271,6 @@ if (ENABLE_DATA_SAVER) {
     // Initial run
     document.querySelectorAll('img').forEach(processImage);
 }
-
-    // =========================================================
-    // 1. CPU SAVER: Throttle Animations to 1 FPS , width fixes, kill popups
-    // =========================================================
-    window.requestAnimationFrame = function(callback) {
-        return window.setTimeout(function() {
-            callback(Date.now());
-        }, 1000);
-    };
-
-    window.cancelAnimationFrame = function(id) {
-        clearTimeout(id);
-    };
-
-    window.open = function() {
-        return null;
-    };
-
     // =========================================================
     // 2. CPU SAVER: Clamp High-Frequency Timers
     // =========================================================
