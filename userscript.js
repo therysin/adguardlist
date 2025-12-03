@@ -13,58 +13,79 @@
     // =========================================================
     // 1. CONFIGURATION (Forced ON for testing)
     // =========================================================
-    // const ENABLE_DATA_SAVER = true; 
-    // const IMAGE_QUALITY = 55; // Quality 1-100 (60 is a good balance)
+    const ENABLE_DATA_SAVER = true; 
+    const IMAGE_QUALITY = 55; // Quality 1-100 (60 is a good balance)
+    const FORCE_PROXY = true;
 
 // =========================================================
 // 2. DATA SAVER (No Fallback)
 // =========================================================
-// if (ENABLE_DATA_SAVER) {
+if (ENABLE_DATA_SAVER) {
 
-//     function createProxyUrl(originalUrl, width) {
-//         if (!originalUrl || originalUrl.includes('wsrv.nl') || originalUrl.startsWith('data:')) return originalUrl;
-//         const encoded = encodeURIComponent(originalUrl);
-//         return `https://wsrv.nl/?url=${encoded}&w=${width}&q=${IMAGE_QUALITY}&output=webp`;
-//     }
+    function createProxyUrl(originalUrl, width) {
+        // 1. Sanity Checks
+        if (!originalUrl || originalUrl.includes('statically.io') || originalUrl.startsWith('data:')) return originalUrl;
 
-//     function processImage(img) {
-//         if (img.dataset.processed) return;
+        // 2. Strip Protocol (http:// or https://) for Statically
+        let cleanUrl = originalUrl.replace(/^https?:\/\//, '');
 
-//         const originalSrc = img.getAttribute('data-src') || img.src; // fix
-//         if (!originalSrc) return;
+        // 3. Construct URL
+        // w = width, quality = 1-100, f = format (webp)
+        return `https://cdn.statically.io/img/${cleanUrl}?w=${width}&quality=${IMAGE_QUALITY}&f=webp`;
+    }
 
-//         img.dataset.processed = "true";
+    function processImage(img) {
+        if (img.dataset.processed) return;
 
-//         // Nuke srcset to force our specific URL
-//         if (img.hasAttribute('srcset')) img.removeAttribute('srcset');
+        // Get the real source (check data-src for lazy loaded images first)
+        const originalSrc = img.getAttribute('data-src') || img.src;
+        if (!originalSrc) return;
 
-//         // Compute width per image
-//         let displayWidth = img.clientWidth || img.width || window.innerWidth;
-//         if (!displayWidth || displayWidth <= 0) {
-//             displayWidth = window.innerWidth;
-//         }
+        // Save original for the error handler fallback
+        img.dataset.original = originalSrc;
+        img.dataset.processed = "true";
 
-//         const newSrc = createProxyUrl(originalSrc, displayWidth);
+        // Nuke srcset to force our specific URL
+        if (img.hasAttribute('srcset')) img.removeAttribute('srcset');
 
-//         // Force the proxy URL. If this fails, the image dies.
-//         if (img.getAttribute('data-src')) img.setAttribute('data-src', newSrc);
-//         img.src = newSrc;
-//     }
+        // Compute width per image
+        let displayWidth = img.clientWidth || img.width || window.innerWidth;
+        if (!displayWidth || displayWidth <= 0) {
+            displayWidth = window.innerWidth;
+        }
 
-//     const imageObserver = new MutationObserver((mutations) => {
-//         mutations.forEach((mutation) => {
-//             mutation.addedNodes.forEach((node) => {
-//                 if (node.nodeType !== Node.ELEMENT_NODE) return;
-//                 if (node.tagName === 'IMG') processImage(node);
-//                 if (node.querySelectorAll) node.querySelectorAll('img').forEach(processImage);
-//             });
-//         });
-//     });
+        const newSrc = createProxyUrl(originalSrc, displayWidth);
 
-//     imageObserver.observe(document.body, { childList: true, subtree: true });
-//     document.querySelectorAll('img').forEach(processImage);
-// };
+        // 💡 CONDITIONAL ERROR HANDLING
+        // Only attach the fallback logic if strict forcing is NOT enabled.
+        if (!FORCE_PROXY) {
+            img.onerror = function() {
+                this.onerror = null; // Prevent infinite loop
+                this.src = this.dataset.original; // Revert to original
+            };
+        }
 
+        // Apply the proxy URL
+        if (img.getAttribute('data-src')) img.setAttribute('data-src', newSrc);
+        img.src = newSrc;
+    }
+
+    // Observer to handle lazy-loaded images as you scroll
+    const imageObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType !== Node.ELEMENT_NODE) return;
+                if (node.tagName === 'IMG') processImage(node);
+                if (node.querySelectorAll) node.querySelectorAll('img').forEach(processImage);
+            });
+        });
+    });
+
+    imageObserver.observe(document.body, { childList: true, subtree: true });
+    
+    // Process existing images immediately
+    document.querySelectorAll('img').forEach(processImage);
+};
     // =========================================================
     // 1. CPU SAVER: Throttle Animations to 1 FPS , width fixes, kill popups
     // =========================================================
