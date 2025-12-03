@@ -25,28 +25,31 @@ if (ENABLE_DATA_SAVER) {
         if (
             !originalUrl ||
             originalUrl.startsWith('data:') ||
-            originalUrl.includes('statically.io')
+            originalUrl.includes('i0.wp.com')
         ) {
             return originalUrl;
         }
 
-        // Normalize to absolute URL if needed
-        let src = originalUrl;
-
-        // Protocol-relative URLs: //cdn.example.com/img.jpg
-        if (src.startsWith('//')) {
-            src = window.location.protocol + src;
-        }
-        // Root-relative URLs: /images/img.jpg
-        else if (src.startsWith('/')) {
-            src = window.location.origin + src;
+        // Normalize to absolute URL
+        let url = originalUrl;
+        try {
+            // Handles relative URLs (/img.jpg, img.jpg) and protocol-relative (//cdn.example.com/img.jpg)
+            url = new URL(originalUrl, window.location.href).href;
+        } catch (e) {
+            // If URL constructor fails, bail out and use original
+            return originalUrl;
         }
 
-        // Strip protocol for Statically
-        const cleanUrl = src.replace(/^https?:\/\//, '');
+        const isHttps = url.startsWith('https://');
+        const noProtocol = url.replace(/^https?:\/\//, '');
 
-        // Construct Statically URL
-        return `https://cdn.statically.io/img/${cleanUrl}?w=${width}&quality=${IMAGE_QUALITY}&f=webp`;
+        // Photon pattern: https://i0.wp.com/example.com/image.jpg?w=WIDTH&quality=Q[&ssl=1]
+        let proxyUrl = `https://i0.wp.com/${noProtocol}?w=${width}&quality=${IMAGE_QUALITY}`;
+        if (isHttps) {
+            proxyUrl += '&ssl=1';
+        }
+
+        return proxyUrl;
     }
 
     function processImage(img) {
@@ -54,7 +57,7 @@ if (ENABLE_DATA_SAVER) {
         if (img.dataset.processed === 'true') return;
 
         const originalSrc = img.getAttribute('data-src') || img.src;
-        if (!originalSrc || originalSrc.includes('statically.io')) return;
+        if (!originalSrc || originalSrc.includes('i0.wp.com')) return;
 
         // Filter out tiny icons or tracking pixels if we actually know the size
         const w = img.clientWidth || img.naturalWidth || img.width || 0;
@@ -117,8 +120,8 @@ if (ENABLE_DATA_SAVER) {
 
                     // Only re-process if the site changed away from our proxy
                     if (
-                        !src.includes('statically.io') &&
-                        !dataSrc.includes('statically.io')
+                        !src.includes('i0.wp.com') &&
+                        !dataSrc.includes('i0.wp.com')
                     ) {
                         node.dataset.processed = 'false';
                         processImage(node);
@@ -140,12 +143,40 @@ if (ENABLE_DATA_SAVER) {
     document.querySelectorAll('img').forEach(processImage);
 }
 
-})();
+    // =========================================================
+    // 1. CPU SAVER: Throttle Animations to 1 FPS , width fixes, kill popups
+    // =========================================================
+    window.requestAnimationFrame = function(callback) {
+        return window.setTimeout(function() {
+            callback(Date.now());
+        }, 1000);
+    };
+
+    window.cancelAnimationFrame = function(id) {
+        clearTimeout(id);
+    };
+
+    window.open = function() {
+        return null;
+    };
+
+    // =========================================================
+    // 2. CPU SAVER: Clamp High-Frequency Timers
+    // =========================================================
+    // Many ads and trackers run loops every 10-50ms. 
+    // This forces them to wait at least 1 second (1000ms).
+    const originalSetInterval = window.setInterval;
+    window.setInterval = function(func, delay, ...args) {
+        if (delay < 1000) {
+            delay = 1000;
+        }
+        return originalSetInterval(func, delay, ...args);
+    };
 
     // =========================================================
     // 3. FIT WIDTH & AUTO-ZOOM 
     // =========================================================
- 
+
     // A. Force the browser to render as a mobile device (width=device-width)
     // This stops the page from loading as a giant "Desktop" site.
     // let viewport = document.querySelector("meta[name=viewport]");
@@ -163,7 +194,7 @@ if (ENABLE_DATA_SAVER) {
     // =========================================================
     // Instead of using a MutationObserver (which costs CPU), 
     // we inject CSS rules that the browser applies automatically.
-    
+
     const css = `     
         /* STOP ALL CSS ANIMATIONS */
         /* This stops spinning loaders, flashing ads, and transitions */
@@ -176,7 +207,7 @@ if (ENABLE_DATA_SAVER) {
     const style = document.createElement('style');
     style.type = 'text/css';
     style.appendChild(document.createTextNode(css));
-    
+
     // Append to head (or body if head doesn't exist yet)
     (document.head || document.documentElement).appendChild(style);
 
