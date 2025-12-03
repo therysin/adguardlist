@@ -28,6 +28,17 @@
     };
 
     // =========================================================
+    // 2b. Clamp high-frequency setTimeout
+    // =========================================================
+    const originalSetTimeout = window.setTimeout;
+    window.setTimeout = function (fn, delay, ...args) {
+        if (typeof delay !== 'number' || delay < 1000) {
+            delay = 1000; // minimum 1s
+        }
+        return originalSetTimeout(fn, delay, ...args);
+    };
+
+    // =========================================================
     // 3. FIT WIDTH & AUTO-ZOOM 
     // =========================================================
 
@@ -64,5 +75,52 @@
 
     // Append to head (or body if head doesn't exist yet)
     (document.head || document.documentElement).appendChild(style);
+
+    // =========================================================
+    // 5. POPUP / NEW TAB BLOCKER (AGGRESSIVE — NO WHITELIST)
+    // =========================================================
+    
+    // 1. Block window.open()
+    const originalWindowOpen = window.open;
+    window.open = function (url, target, features) {
+        console.log('[MangaScript] Blocked popup:', url);
+        return null; // return "failed"
+    };
+    
+    // 2. Block target="_blank" links
+    document.addEventListener('click', function (e) {
+        const link = e.target.closest('a[target="_blank"]');
+        if (!link) return;
+    
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        console.log('[MangaScript] Blocked link new-tab:', link.href);
+    }, true);  // capture so we beat site JS
+    
+    // 3. Block JS attempting to change link targets dynamically
+    document.addEventListener('mousedown', e => {
+        const link = e.target.closest('a');
+        if (link && link.target === '_blank') {
+            link.target = '_self';
+        }
+    }, true);
+    
+    // 4. Block "forced" popups via dispatch events (common on manga sites)
+    ['mouseup', 'touchend'].forEach(evt => {
+        document.addEventListener(evt, function (e) {
+            // If the site tries to open a tab AFTER the click
+            // (common trick in ad scripts)
+            setTimeout(() => {
+                // Override just in case another script restored window.open
+                window.open = function () { return null; };
+            }, 0);
+        }, true);
+    });
+    
+    // 5. Prevent scripts from re-hooking window.open
+    Object.defineProperty(window, 'open', {
+        configurable: false,
+        writable: false
+    });
 
 })();
